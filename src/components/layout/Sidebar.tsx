@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, LogOut, User, Menu } from 'lucide-react';
 import { menuConfig } from '../../config/menuConfig';
 import { CollapsibleSection } from './CollapsibleSection';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface SidebarProps {
 export const Sidebar = ({ isOpen, onClose, onNavigate }: SidebarProps) => {
   const [currentPath, setCurrentPath] = useState('/dashboard');
   const [isMobile, setIsMobile] = useState(false);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const checkMobile = () => {
@@ -29,6 +31,11 @@ export const Sidebar = ({ isOpen, onClose, onNavigate }: SidebarProps) => {
     if (isMobile) {
       onClose();
     }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    onNavigate?.('/login');
   };
 
   const sidebarContent = (
@@ -100,18 +107,19 @@ export const Sidebar = ({ isOpen, onClose, onNavigate }: SidebarProps) => {
             <User className="w-5 h-5 text-gray-900" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-medium truncate">Admin User</p>
-            <p className="text-gray-400 text-xs truncate">admin@hopenn.com</p>
+            <p className="text-white text-sm font-medium truncate">{user?.email || 'User'}</p>
+            <p className="text-gray-400 text-xs truncate">{user?.email || 'Not authenticated'}</p>
           </div>
         </div>
 
         <div className="flex items-center justify-between px-2">
           <span className="inline-flex items-center px-2.5 py-1 text-xs font-semibold bg-yellow-400/10 text-yellow-400 rounded-full border border-yellow-400/20">
-            Mode démo
+            Authenticated
           </span>
           <button
+            onClick={handleLogout}
             className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-800 rounded-lg transition-colors group"
-            title="Déconnexion"
+            title="Logout"
           >
             <LogOut className="w-4 h-4" />
           </button>
